@@ -1,7 +1,6 @@
 import streamlit as st
 from PyPDF2 import PdfReader
 from docx import Document
-import pytesseract
 from PIL import Image
 import requests
 from requests.exceptions import InvalidURL,ConnectionError
@@ -101,7 +100,7 @@ st.markdown('<h3>Is your resume good enough?</h3>', unsafe_allow_html=True)
 
 st.markdown('<p class="msg">A free and fast AI resume analyser, that checks how well your resume align with job descriptions and gives you suggestions to improve your resume, highlight key skills and tailor it to specific job requirements, thus increases your chance of passing the resume screening process!</p>',unsafe_allow_html=True)
 
-uploaded_file = st.file_uploader("Upload your resume:", type=["pdf", "docx", "txt", "jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("Upload your resume:", type=["pdf", "docx", "txt"])
 st.markdown('<small>Privacy guaranteed</small>', unsafe_allow_html=True)
 job_url = st.text_input("Enter the job description URL:")
 
@@ -159,10 +158,6 @@ def extract_text_from_pdf(file):
 def extract_text_from_txt(file):
     return file.decode('utf-8')
 
-def extract_text_from_image(file):
-    image = Image.open(BytesIO(file))
-    return pytesseract.image_to_string(image)
-
 def extract_skills(file_bytes):
     file_extension = file_bytes[:4] 
     
@@ -197,14 +192,24 @@ def extract_skills_from_job_description(url):
 # Loading model and tokenizer
 import pickle
 import tensorflow as tf
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.preprocessing.sequence import pad_sequences # type: ignore
+
+# Define model path
+model_path = 'rnn_lstm_model.keras'
+tokenizer_path = 'tokenizer_rnn_lstm.pkl'
 
 # Load the trained model
-model = tf.keras.models.load_model('C:\\Users\\Aswathy\\OneDrive\\Desktop\\Github\\Resume Analyser RNN LSTM\\rnn_lstm_model.keras')
+try:
+    model = tf.keras.models.load_model(model_path)
+except Exception as e:
+    st.error(f"Error loading the model: {e}")
 
 # Load the tokenizer
-with open('C:\\Users\\Aswathy\\OneDrive\\Desktop\\Github\\Resume Analyser RNN LSTM\\tokenizer_rnn_lstm.pkl', 'rb') as file:
-    tokenizer = pickle.load(file)
+try:
+    with open(tokenizer_path, 'rb') as file:
+        tokenizer = pickle.load(file)
+except Exception as e:
+    st.error(f"Error loading the tokenizer: {e}")
 
 recommendations_dict = {
     "Agile": "Explore Agile methodologies like Scrum and Kanban through practical application in team projects.",
