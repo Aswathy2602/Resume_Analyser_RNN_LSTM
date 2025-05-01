@@ -191,12 +191,12 @@ def extract_skills_from_job_description(url):
 
 # Loading model and tokenizer
 import pickle
-import tensorflow as tf
+import tensorflow as tf # type: ignore
 from tensorflow.keras.preprocessing.sequence import pad_sequences # type: ignore
 
 # Define model path
-model_path = 'rnn_lstm_model.keras'
-tokenizer_path = 'tokenizer_rnn_lstm.pkl'
+model_path = 'models/rnn_lstm_model.keras'
+tokenizer_path = 'models/tokenizer_rnn_lstm.pkl'
 
 # Load the trained model
 try:
